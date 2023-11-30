@@ -10,6 +10,7 @@ class Staff(models.Model):
     name = models.CharField(max_length=50, default="")
     password = models.CharField(max_length=6255)
     password_is_hashed = models.BooleanField(default=False)
+    isAdvisor = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         # CREATING HASH FOR THE PASSWORD
@@ -23,6 +24,15 @@ class Staff(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_main_data(self):
+        data = {
+            "username": self.username,
+            "name": self.name,
+            "isAdvisor": self.isAdvisor,
+        }
+
+        return data
 
     def check_password(self, password):
         return bcrypt.checkpw(password.encode("utf-8"), (self.password).encode("utf-8"))
@@ -35,7 +45,7 @@ class Staff(models.Model):
                 return user
         except cls.DoesNotExist:
             return None
-        
+
         return None
 
 
@@ -45,7 +55,6 @@ class Student(models.Model):
     name = models.CharField(max_length=50, default="")
     password = models.CharField(max_length=6255)
     password_is_hashed = models.BooleanField(default=False)
-
 
     def __str__(self):
         return self.name
@@ -61,7 +70,7 @@ class Student(models.Model):
             super().save(*args, **kwargs)
 
     def check_password(self, password):
-        return bcrypt.checkpw(password.encode('utf-8'), (self.password).encode('utf-8'))
+        return bcrypt.checkpw(password.encode("utf-8"), (self.password).encode("utf-8"))
 
     @classmethod
     def authenticate(cls, username, password):
@@ -71,5 +80,5 @@ class Student(models.Model):
                 return user
         except cls.DoesNotExist:
             return None
-        
+
         return None

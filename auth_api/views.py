@@ -1,7 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import StaffLoginSerializer, get_tokens_for_user, StudentLoginSerializer
+from .serializers import (
+    StaffLoginSerializer,
+    get_tokens_for_user,
+    StudentLoginSerializer,
+)
 from django.contrib.auth import authenticate
 from .models import *
 
@@ -37,7 +41,10 @@ class StaffLoginAPIView(APIView):
                 tokens = get_tokens_for_user(user)
 
                 return Response(
-                    tokens,
+                    {
+                        "tokens": tokens,
+                        "userData": user.get_main_data(),
+                    },
                     status=status.HTTP_200_OK,
                 )
             else:
