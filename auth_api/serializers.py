@@ -14,3 +14,8 @@ def get_tokens_for_user(user):
 class StaffLoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
+
+
+class StudentLoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
