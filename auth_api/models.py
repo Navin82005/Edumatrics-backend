@@ -52,7 +52,9 @@ class Staff(models.Model):
 class Student(models.Model):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=255)
-    name = models.CharField(max_length=50, default="")
+    rollNumber = models.CharField(max_length=8, blank=True)
+    registerNumber = models.CharField(max_length=15, blank=True)
+    name = models.CharField(max_length=50, blank=True)
     password = models.CharField(max_length=6255)
     password_is_hashed = models.BooleanField(default=False)
 

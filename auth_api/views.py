@@ -9,7 +9,6 @@ from .serializers import (
 from django.contrib.auth import authenticate
 from .models import *
 
-
 # ACCESS TOKEN REFRESHER API
 class RefreshAccessToken(APIView):
     def post(self, request, *args, **kwargs):
