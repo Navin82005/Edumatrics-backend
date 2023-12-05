@@ -16,15 +16,30 @@ class getStudents(APIView):
             hallData = LectureHall.objects.get(className=lectureHall)
             rawData = hallData.names.all()
 
-            data = {(x.name, x.rollNumber, False) for x in rawData}
-            data = sorted(data)
-            data = json.dumps(data)
+            # data = [{"name" : x.name, x.rollNumber, False} for x in rawData]
+            data = []
+
+            # rawData = sorted(rawData)
+            for x in rawData:
+                data += [
+                    {
+                        "name": x.name,
+                        "rollNumber": x.rollNumber,
+                        "isPresent": True,
+                        "isOD": False,
+                    }
+                ]
+
+            Sorted_dict = sorted(data, key=lambda x: x["name"])
+            data = Sorted_dict
             print(data)
-            return JsonResponse(
+            # data = json.dumps(Sorted_dict)
+            return Response(
                 {
                     "body": data,
-                    # status.HTTP_200_OK,
-                }
+                    "total": len(data),
+                    "status": status.HTTP_200_OK,
+                },
             )
         else:
             return Response(
