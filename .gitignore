@@ -1,0 +1,16 @@
+__pycache__
+
+attendanceManager\__pycache__
+attendanceManager\migrations
+
+auth_api\__pycache__
+auth_api\migrations
+
+backend\__pycache__
+backend\migrations
+
+lectureHall\__pycache__
+lectureHall\migrations
+
+edumatricsBackend
+.vscode

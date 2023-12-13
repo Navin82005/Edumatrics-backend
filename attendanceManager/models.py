@@ -10,3 +10,6 @@ class LectureHall(models.Model):
 
     def __str__(self):
         return self.className
+
+class Attadence(models.Model):
+    user = models.OneToOneField(to=Student, on_delete=models.CASCADE)
