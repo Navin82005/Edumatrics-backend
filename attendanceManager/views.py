@@ -25,7 +25,7 @@ class getStudents(APIView):
                     {
                         "name": x.name,
                         "rollNumber": x.rollNumber,
-                        "isPresent": True,
+                        "isPresent": False,
                         "isOD": False,
                     }
                 ]
