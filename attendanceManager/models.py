@@ -11,5 +11,26 @@ class LectureHall(models.Model):
     def __str__(self):
         return self.className
 
-class Attadence(models.Model):
-    user = models.OneToOneField(to=Student, on_delete=models.CASCADE)
+class Periods(models.Model):
+    name = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+class ClassSession(models.Model):
+    period = models.ManyToManyField(to=Periods)
+    date = models.DateField(blank=True, null=True, auto_now_add=True)
+    isPresent = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.date)
+
+class LectureHallAttadence(models.Model):
+    user = models.ManyToManyField(to=LectureHall)
+    name = models.CharField(max_length=255, null=True)
+    classSession = models.ManyToManyField(to=ClassSession)
+    # for u in user.name:
+    #     u = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return str(self.name) + ' Attendance'
