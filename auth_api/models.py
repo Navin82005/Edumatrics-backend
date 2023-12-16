@@ -63,13 +63,16 @@ class Student(models.Model):
 
     def save(self, *args, **kwargs):
         # CREATING HASH FOR THE PASSWORD
+        self.name = self.name.title()
+        print(self.name)
         if not self.password_is_hashed:
             encoded_password = (self.password).encode("utf-8")
             salt = bcrypt.gensalt()
             self.password = bcrypt.hashpw(encoded_password, salt)
             self.password = self.password.decode("utf-8")
             self.password_is_hashed = True
-            super().save(*args, **kwargs)
+        
+        super().save(*args, **kwargs)
 
     def check_password(self, password):
         return bcrypt.checkpw(password.encode("utf-8"), (self.password).encode("utf-8"))

@@ -10,7 +10,7 @@ class LectureHall(models.Model):
         return self.className
 
 
-class Periods(models.Model):
+class TimeTable(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
@@ -18,7 +18,7 @@ class Periods(models.Model):
 
 
 class ClassSession(models.Model):
-    period = models.ManyToManyField(to=Periods)
+    period = models.ManyToManyField(to=TimeTable)
     date = models.DateField(blank=True, null=True, auto_now_add=True)
     isPresent = models.BooleanField(default=False)
 
@@ -27,7 +27,7 @@ class ClassSession(models.Model):
 
 
 class LectureHallAttadence(models.Model):
-    user = models.ManyToManyField(to=LectureHall)
+    Class = models.ManyToManyField(to=LectureHall)
     name = models.ManyToManyField(to=Student)
     h1 = models.CharField(max_length=255, null=True, blank=True)
     h2 = models.CharField(max_length=255, null=True, blank=True)
@@ -40,9 +40,9 @@ class LectureHallAttadence(models.Model):
     mainName = models.CharField(max_length=255, null=True, blank=True)
 
 
-    def save(self, *args, **kwargs):
-        self.mainName = str(self.name.first())
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     self.mainName = str(self.name.first())
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name.first()} - {self.date}"

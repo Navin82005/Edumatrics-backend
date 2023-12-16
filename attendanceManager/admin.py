@@ -5,4 +5,4 @@ from .models import *
 admin.site.register(LectureHall)
 admin.site.register(LectureHallAttadence)
 admin.site.register(ClassSession)
-admin.site.register(Periods)
+admin.site.register(TimeTable)
