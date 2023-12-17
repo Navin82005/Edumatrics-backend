@@ -26,6 +26,8 @@ SECRET_KEY = "django-insecure-th_lp7!@u7(rf4y!r@u49@g+j*vdl$16okv9@j&v$k05@$slop
 DEBUG = True
 
 ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['navin82005.pythonanywhere.com',  'localhost', 'https://127.0.0.1:8000']
+
 
 
 # Application definition
@@ -42,6 +44,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     "auth_api",
     "attendanceManager",
+    "lecture_hall",
+    
 ]
 
 MIDDLEWARE = [
@@ -60,7 +64,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

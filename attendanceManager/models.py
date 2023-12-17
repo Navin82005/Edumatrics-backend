@@ -1,5 +1,5 @@
 from django.db import models
-from auth_api.models import Student
+from auth_api.models import Student, Staff
 
 
 class LectureHall(models.Model):
@@ -11,10 +11,47 @@ class LectureHall(models.Model):
 
 
 class TimeTable(models.Model):
-    name = models.CharField(max_length=255, blank=True, null=True)
+    # DATA
+    # 08:30-09:30=DBMS||09:30-10:30=VERBAL||10:50-11:50=DM||11:50-12:50=MPMC||[01:40-02:40,02:40-03:25,03:45-04:30]=MPMC LAB
+    
+    # name = models.CharField(max_length=255, blank=True, null=True)
+    # Class = models.OneToOneField(to=LectureHall, on_delete=models.CASCADE, null=True)
+    # monday = models.CharField(max_length=355, blank=True, null=True)
+    # tuesday = models.CharField(max_length=355, blank=True, null=True)
+    # wednesday = models.CharField(max_length=355, blank=True, null=True)
+    # thursday = models.CharField(max_length=355, blank=True, null=True)
+    # friday = models.CharField(max_length=355, blank=True, null=True)
+    # saturday = models.CharField(max_length=355, blank=True, null=True)
+
+    Class = models.ManyToManyField(to=LectureHall)
+    day = models.CharField(max_length=30, null=True)
+    hour = models.CharField(max_length=30, null=True)
+    period = models.CharField(max_length=255, null=True)
+    start = models.TimeField(null=True, blank=True)
+    end = models.TimeField(null=True, blank=True)
+
 
     def __str__(self):
-        return self.name
+        return str(self.Class.first()) + " " + str(self.day).capitalize() + " " + str(self.hour) + " Time Table"
+
+    class Meta:
+        ordering = ['day', 'hour']
+
+
+class StaffTimeTable(models.Model):
+    staffName = models.ManyToManyField(to=Staff)
+    Class = models.ManyToManyField(to=LectureHall)
+    day = models.CharField(max_length=30, null=True)
+    hour = models.CharField(max_length=30, null=True)
+    course = models.CharField(max_length=255, null=True)
+    start = models.TimeField(null=True, blank=True)
+    end = models.TimeField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.staffName.first()).capitalize() + " " + str(self.Class.first()) + " " + str(self.day).capitalize() + " " + str(self.course)
+
+    class Meta:
+        ordering = ['day', 'hour']
 
 
 class ClassSession(models.Model):

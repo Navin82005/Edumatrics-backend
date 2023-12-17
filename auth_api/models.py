@@ -58,6 +58,9 @@ class Student(models.Model):
     password = models.CharField(max_length=6255)
     password_is_hashed = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['username']
+
     def __str__(self):
         return self.name
 
