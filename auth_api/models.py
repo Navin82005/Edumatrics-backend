@@ -77,6 +77,16 @@ class Student(models.Model):
         
         super().save(*args, **kwargs)
 
+    def get_main_data(self):
+        data = {
+            "username": self.username,
+            "name": self.name,
+            "rollNo": self.rollNumber,
+            "regNo": self.registerNumber,
+        }
+
+        return data
+
     def check_password(self, password):
         return bcrypt.checkpw(password.encode("utf-8"), (self.password).encode("utf-8"))
 
