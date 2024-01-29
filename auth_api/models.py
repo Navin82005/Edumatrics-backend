@@ -11,6 +11,7 @@ class Staff(models.Model):
     password = models.CharField(max_length=6255)
     password_is_hashed = models.BooleanField(default=False)
     isAdvisor = models.BooleanField(default=False)
+    lectureHall = models.CharField(max_length=30, blank=True)
 
     def save(self, *args, **kwargs):
         # CREATING HASH FOR THE PASSWORD
@@ -26,13 +27,12 @@ class Staff(models.Model):
         return self.name
 
     def get_main_data(self):
-        data = {
+        return {
             "username": self.username,
             "name": self.name,
             "isAdvisor": self.isAdvisor,
+            "lectureHall": self.lectureHall,
         }
-
-        return data
 
     def check_password(self, password):
         return bcrypt.checkpw(password.encode("utf-8"), (self.password).encode("utf-8"))
@@ -57,9 +57,10 @@ class Student(models.Model):
     name = models.CharField(max_length=50, blank=True)
     password = models.CharField(max_length=6255)
     password_is_hashed = models.BooleanField(default=False)
+    lectureHall = models.CharField(max_length=30, blank=True)
 
     class Meta:
-        ordering = ['username']
+        ordering = ["username"]
 
     def __str__(self):
         return self.name
@@ -74,18 +75,17 @@ class Student(models.Model):
             self.password = bcrypt.hashpw(encoded_password, salt)
             self.password = self.password.decode("utf-8")
             self.password_is_hashed = True
-        
+
         super().save(*args, **kwargs)
 
     def get_main_data(self):
-        data = {
+        return {
             "username": self.username,
             "name": self.name,
             "rollNo": self.rollNumber,
             "regNo": self.registerNumber,
+            "lectureHall": self.lectureHall,
         }
-
-        return data
 
     def check_password(self, password):
         return bcrypt.checkpw(password.encode("utf-8"), (self.password).encode("utf-8"))
