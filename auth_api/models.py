@@ -12,6 +12,8 @@ class Staff(models.Model):
     password_is_hashed = models.BooleanField(default=False)
     isAdvisor = models.BooleanField(default=False)
     lectureHall = models.CharField(max_length=30, blank=True)
+    userMobile = models.CharField(max_length=30, blank=True)
+    userDob = models.CharField(max_length=30, blank=True)
 
     def save(self, *args, **kwargs):
         # CREATING HASH FOR THE PASSWORD
@@ -32,6 +34,8 @@ class Staff(models.Model):
             "name": self.name,
             "isAdvisor": self.isAdvisor,
             "lectureHall": self.lectureHall,
+            "userMobile": self.userMobile,
+            "userDob": self.userDob,
         }
 
     def check_password(self, password):
@@ -58,6 +62,8 @@ class Student(models.Model):
     password = models.CharField(max_length=6255)
     password_is_hashed = models.BooleanField(default=False)
     lectureHall = models.CharField(max_length=30, blank=True)
+    userMobile = models.CharField(max_length=30, blank=True)
+    userDob = models.CharField(max_length=30, blank=True)
 
     class Meta:
         ordering = ["username"]
@@ -66,7 +72,6 @@ class Student(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        # CREATING HASH FOR THE PASSWORD
         self.name = self.name.title()
         print(self.name)
         if not self.password_is_hashed:
@@ -85,6 +90,8 @@ class Student(models.Model):
             "rollNo": self.rollNumber,
             "regNo": self.registerNumber,
             "lectureHall": self.lectureHall,
+            "userMobile": self.userMobile,
+            "userDob": self.userDob,
         }
 
     def check_password(self, password):
