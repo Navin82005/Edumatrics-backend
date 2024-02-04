@@ -64,6 +64,7 @@ class Student(models.Model):
     lectureHall = models.CharField(max_length=30, blank=True)
     userMobile = models.CharField(max_length=30, blank=True)
     userDob = models.CharField(max_length=30, blank=True)
+    profile_picture = models.FileField(upload_to='images/profiles', blank=True)
 
     class Meta:
         ordering = ["username"]

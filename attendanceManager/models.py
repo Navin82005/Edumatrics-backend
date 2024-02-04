@@ -13,7 +13,7 @@ class LectureHall(models.Model):
 class TimeTable(models.Model):
     # DATA
     # 08:30-09:30=DBMS||09:30-10:30=VERBAL||10:50-11:50=DM||11:50-12:50=MPMC||[01:40-02:40,02:40-03:25,03:45-04:30]=MPMC LAB
-    
+
     # name = models.CharField(max_length=255, blank=True, null=True)
     # Class = models.OneToOneField(to=LectureHall, on_delete=models.CASCADE, null=True)
     # monday = models.CharField(max_length=355, blank=True, null=True)
@@ -29,13 +29,31 @@ class TimeTable(models.Model):
     period = models.CharField(max_length=255, null=True)
     start = models.TimeField(null=True, blank=True)
     end = models.TimeField(null=True, blank=True)
-
+    classname = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return str(self.Class.first()) + " " + str(self.day).capitalize() + " " + str(self.hour) + " Time Table"
+        self.classname = str(self.Class.first())
+        self.save()
+        return (
+            str(self.Class.first())
+            + " "
+            + str(self.day).capitalize()
+            + " "
+            + str(self.hour)
+            + " Time Table"
+        )
 
     class Meta:
-        ordering = ['day', 'hour']
+        ordering = ["classname", "day", "hour"]
+
+    def returnData(self):
+        return {
+            "day": self.day,
+            "hour": self.hour,
+            "period": self.period,
+            "start": self.start,
+            "end": self.end,
+        }
 
 
 class StaffTimeTable(models.Model):
@@ -48,10 +66,28 @@ class StaffTimeTable(models.Model):
     end = models.TimeField(null=True, blank=True)
 
     def __str__(self):
-        return str(self.staffName.first()).capitalize() + " " + str(self.Class.first()) + " " + str(self.day).capitalize() + " " + str(self.course)
+        return (
+            str(self.staffName.first()).capitalize()
+            + " "
+            + str(self.Class.first())
+            + " "
+            + str(self.day).capitalize()
+            + " "
+            + str(self.course)
+        )
+
+    def returnData(self):
+        return {
+            "day": self.day,
+            "class": self.Class,
+            "hour": self.hour,
+            "course": self.course,
+            "start": self.start,
+            "end": self.end,
+        }
 
     class Meta:
-        ordering = ['day', 'hour']
+        ordering = ["day", "hour"]
 
 
 class ClassSession(models.Model):
@@ -75,7 +111,6 @@ class LectureHallAttadence(models.Model):
     h7 = models.CharField(max_length=255, null=True, blank=True)
     date = models.DateField(null=True)
     mainName = models.CharField(max_length=255, null=True, blank=True)
-
 
     # def save(self, *args, **kwargs):
     #     self.mainName = str(self.name.first())
