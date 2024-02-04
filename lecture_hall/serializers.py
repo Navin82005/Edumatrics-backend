@@ -101,7 +101,7 @@ def getStaffTimeTable(name):
      
         print("temp", temp)
         data = temp
-     
+    
     except Exception as e:
         print("Exception in lecture_hall.serializers: ", e)
     print(data)
