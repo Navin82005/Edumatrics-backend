@@ -66,7 +66,7 @@ def getStudentTimeTable(_class):
         k = 0
         while k < 7:
             data.append(timings[k])
-            print(timings[k])
+            print("timings[k]",timings[k])
             for i in days:
                 try:
                     data.append(raw_data[i][k][2])
@@ -104,6 +104,5 @@ def getStaffTimeTable(name):
     
     except Exception as e:
         print("Exception in lecture_hall.serializers: ", e)
-    print(data)
-    print(len(data))
+
     return data

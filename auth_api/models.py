@@ -23,7 +23,7 @@ class Staff(models.Model):
             self.password = bcrypt.hashpw(encoded_password, salt)
             self.password = self.password.decode("utf-8")
             self.password_is_hashed = True
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

@@ -121,3 +121,21 @@ class LectureHallAttadence(models.Model):
 
     class Meta:
         ordering = ["date", "mainName"]
+
+    def returnPeriods(self):
+        return {
+            1: self.h1,
+            2: self.h2,
+            3: self.h3,
+            4: self.h4,
+            5: self.h5,
+            6: self.h6,
+            7: self.h7,
+        }
+
+    def returnData(self):
+        return {
+            "date": self.date,
+            "mainName": self.mainName,
+            "class": self.Class,
+        }

@@ -7,25 +7,33 @@ from django.http import JsonResponse
 import json
 from datetime import datetime
 from auth_api.models import Student
-from .serializers import get_period_cell, set_cell, get_cell_data
+from .serializers import (
+    get_period_cell,
+    set_cell,
+    get_cell_data,
+    get_subject_attendance,
+)
 
 
 # Create your views here.
 class GetStudents(APIView):
-    def post(self, request, *args, **kwargs):
-        lectureHall = request.POST["lh"]
-        _now_time = kwargs['dateTime']
+
+    def get(self, request, *args, **kwargs):
+        # lectureHall = request.GET["lh"]
+        _now_time = kwargs["dateTime"]
+        lectureHall = _now_time.split(",")[1]
+        print("GetStudents lectureHall", lectureHall)
+        _now_time = _now_time.split(",")[0]
         print(lectureHall)
         if LectureHall.objects.filter(className=lectureHall) != None:
             hallData = LectureHall.objects.get(className=lectureHall)
             rawData = hallData.names.all()
 
-            _period = get_period_cell(lectureHall)[1]
+            cell = get_period_cell(lectureHall, _now_time=_now_time)
+            _period = cell[1]
 
-            # data = [{"name" : x.name, x.rollNumber, False} for x in rawData]
             data = []
 
-            # rawData = sorted(rawData)
             for x in rawData:
                 data += [
                     {
@@ -39,19 +47,67 @@ class GetStudents(APIView):
             print("Period", _period)
             date = datetime.now().date()
             for i in data:
-                temp = LectureHallAttadence.objects.filter(mainName=i['name'], date=date)
+                temp = LectureHallAttadence.objects.filter(
+                    mainName=i["name"], date=date
+                )
                 if list(temp) != []:
-                    # print(i["name"], temp[0])
-                    print(get_period_cell(lectureHall)[0])
-                    cell_data = get_cell_data(cell=get_period_cell(lectureHall, _now_time=_now_time)[0], instance=temp[0])
+                    print("get_period_cell(lectureHall)[0]", cell)
+                    cell_data = get_cell_data(cell=cell[0], instance=temp[0])
                     if cell_data != None:
                         i["isPresent"] = cell_data["present"]
                         i["isOD"] = cell_data["od"]
 
-            # Sorted_dict = sorted(data, key=lambda x: x["name"])
-            # data = Sorted_dict
-            # print(data)
-            # data = json.dumps(Sorted_dict)
+            return Response(
+                {
+                    "body": {"data": data, "period": _period},
+                    "total": len(data),
+                    "status": status.HTTP_200_OK,
+                },
+            )
+        else:
+            return Response(
+                {
+                    "Status": "Failed",
+                },
+            )
+
+    def post(self, request, *args, **kwargs):
+        lectureHall = request.POST["lh"]
+        _now_time = kwargs["dateTime"]
+        print(lectureHall)
+        if LectureHall.objects.filter(className=lectureHall) != None:
+            hallData = LectureHall.objects.get(className=lectureHall)
+            rawData = hallData.names.all()
+
+            cell = get_period_cell(lectureHall, _now_time=_now_time)
+            _period = cell[1]
+
+            data = []
+
+            for x in rawData:
+                data += [
+                    {
+                        "name": x.name,
+                        "rollNumber": x.rollNumber,
+                        "isPresent": False,
+                        "isOD": False,
+                    }
+                ]
+
+            print("Period", _period)
+            date = datetime.now().date()
+            for i in data:
+                temp = LectureHallAttadence.objects.filter(
+                    mainName=i["name"], date=date
+                )
+                if list(temp) != []:
+                    print("get_period_cell(lectureHall)[0]", cell)
+                    cell_data = get_cell_data(cell=cell[0], instance=temp[0])
+                    print("cell_data", cell_data)
+                    if cell_data != None:
+                        i["isPresent"] = cell_data["present"]
+                        i["isOD"] = cell_data["od"]
+
             return Response(
                 {
                     "body": {"data": data, "period": _period},
@@ -136,7 +192,7 @@ class markAttendance(APIView):
                 mainName=i["name"], date=dateTime
             )
             if list(stud) != []:
-                print(stud)
+                print("attendanceManager.views stud:", stud)
                 set_cell(i["isPresent"], _cell, list(stud))
 
             else:
@@ -145,7 +201,6 @@ class markAttendance(APIView):
                     mainName=i["name"],
                     date=dateTime,
                 )
-                # set_cell(i["isPresent"], _cell, stud)
 
                 temp.Class.add(_class)
                 temp.name.add(_student)
@@ -155,9 +210,9 @@ class markAttendance(APIView):
 
     def post(self, request, *args, **kwargs):
         lectureHall = kwargs["lh"]
+        classTime = kwargs["classTime"]
+        print("kwargs", kwargs)
         data = request.data
-        # print(lectureHall)
-        # lectureHall = kwargs["lh"]
 
         period = kwargs["course"]
         data1 = [
@@ -205,13 +260,13 @@ class markAttendance(APIView):
             },
         ]
 
-        _cell = get_period_cell(data[0]["class"])
+        _cell = get_period_cell(data[0]["class"], classTime)
         print("cell", _cell)
         dateTime = datetime.now().date()
 
         for i in data:
             _class = LectureHall.objects.get(className=i["class"])
-            # print(_class)
+
             _student = Student.objects.get(name=i["name"])
 
             if i["isPresent"]:
@@ -221,21 +276,17 @@ class markAttendance(APIView):
             else:
                 i["isPresent"] = period.upper() + ":ABSENT"
 
-            stud = LectureHallAttadence.objects.filter(
-                mainName=i["name"], date=dateTime
-            )
-
+            stud = LectureHallAttadence.objects.filter(name=_student, date=dateTime)
+            # print("_cell[0].Type", type(_cell[0]), _cell[0])
             if list(stud) != []:
-                print(stud)
+                # print(set_cell(i["isPresent"], _cell[0], list(stud)), get_cell_data(_cell[0], set_cell(i["isPresent"], _cell[0], list(stud))))
                 set_cell(i["isPresent"], _cell[0], list(stud))
-
             else:
                 temp = LectureHallAttadence.objects.create(
                     mainName=i["name"],
                     date=dateTime,
                 )
-                # set_cell(i["isPresent"], _cell[0], stud)
-                
+
                 temp = set_cell(i["isPresent"], _cell[0], [temp])
 
                 temp.Class.add(_class)
@@ -243,3 +294,25 @@ class markAttendance(APIView):
                 temp.save()
 
         return JsonResponse({"status": 200})
+
+
+class getAttendance(APIView):
+    def get(self, request, *args, **kwargs):
+        studentName = kwargs["student"]
+        lh = kwargs["lh"]
+        _class = lh.split()
+        classes = {"I": 1, "II": 2, "III": 3, "IV": 4, "1": 1, "2": 2, "3": 3, "4": 4}
+
+        lh = str(classes[_class[0]]) + " " + " - ".join(_class[1:])
+
+        attendanceData = {"OOPS": 90, "ADSA": 90, "DBMS": 90, "DM": 90, "Verbal": 90}
+
+        attendanceData = get_subject_attendance(lh, studentName)
+
+        return Response(
+            {
+                "status": 200,
+                "name": studentName,
+                "data": attendanceData,
+            }
+        )

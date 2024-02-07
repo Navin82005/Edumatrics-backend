@@ -10,6 +10,7 @@ from .serializers import (
 from django.contrib.auth import authenticate
 from .models import *
 
+
 # ACCESS TOKEN REFRESHER API
 class RefreshAccessToken(APIView):
     def post(self, request, *args, **kwargs):
@@ -42,7 +43,6 @@ class StaffLoginAPIView(APIView):
 
                 return Response(
                     {
-                        
                         "tokens": tokens,
                         "userData": user.get_main_data(),
                     },
@@ -88,6 +88,7 @@ class AdminLoginAPIView(APIView):
             # Invalid data
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class StudentLoginAPIView(APIView):
     def post(self, request, *args, **kwargs):
         # Serialize and validate the incoming data
@@ -105,7 +106,6 @@ class StudentLoginAPIView(APIView):
 
                 return Response(
                     {
-                        
                         "tokens": tokens,
                         "userData": user.get_main_data(),
                     },

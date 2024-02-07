@@ -1,9 +1,12 @@
 from datetime import datetime
-from .models import TimeTable, LectureHall
+from .models import TimeTable, LectureHall, LectureHallAttadence, Student
+from lecture_hall.models import Subject
 
+def convert_to_datetime(railway_time):
+    normal_time = railway_time.strftime("%I:%M %p")
+    return normal_time
 
-def get_period_cell(lh, _now_time = None):
-    period = ""
+def get_period_cell(lh, _now_time=None):
     days = {
         0: "monday",
         1: "tuesday",
@@ -14,42 +17,45 @@ def get_period_cell(lh, _now_time = None):
         6: "sunday",
     }
 
-    cell = "1"
-    # _time1 = datetime.strptime(, "%H:%M").time()
-    if _now_time == None:
-        _now_time = datetime.now()
-    else:
-        print(_now_time)
-        _now_time = datetime.strptime(_now_time[:5], "%H:%M").time()
-    # _weekday = days[_now_time.weekday()]
-    _weekday = 0
-    print(_now_time.weekday())
+    startTime = ""
+    endTime = ""
+    cell = 7
+    period = ""
+    if _now_time is not None:
+        print("attendanceManager.views stud:", _now_time[:5])
+        startTime = _now_time[:5]
+        endTime = _now_time[8:]
+
+    _weekday = datetime.now().weekday()
 
     _lhall = LectureHall.objects.get(className=lh)
-    data = TimeTable.objects.filter(Class=_lhall, day=days[_weekday])
+    data = TimeTable.objects.filter(
+        Class=_lhall,
+        day=days[_weekday],
+    )
+    # print("attendanceManager.serializers TimeTable data", data)
 
     if list(data) != []:
-        for i in enumerate(data):
-            if i[1].day == days[_weekday] and (
-                i[1].start <= _now_time.time() and i[1].end >= _now_time.time()
+        for i, e in enumerate(data):
+            classPeriod = e.returnData()
+            print(
+                f"classPeriod.start {str(convert_to_datetime(classPeriod['start']))[:-3]} and classPeriod.end {str(convert_to_datetime(classPeriod['end']))[:-3]}, {startTime}, {endTime}"
+            )
+
+            if (
+                str(convert_to_datetime(classPeriod["start"]))[:-3] >= startTime
+                and str(convert_to_datetime(classPeriod["end"]))[:-3] <= endTime
             ):
-                cell = i[0] + 1
-                period = i[1].period
+                print("classPeriod.hour", classPeriod["hour"])
+                cell = int(classPeriod["hour"])
+                period = classPeriod["period"]
                 break
-
-    # data.
-    # print(data, _lhall)
-
-    # _time2 = datetime.strptime(, "%H:%M").time()
-    # print(_time1 < _now_time, _now_time < _time2)
-
-    # DATA
-    # 08:30-09:30=DBMS||09:30-10:30=VERBAL||10:50-11:50=DM||11:50-12:50=MPMC||[01:40-02:40,02:40-03:25,03:45-04:30]=MPMC LAB
 
     return cell, period
 
 
 def set_cell(period, cell, instance):
+    # print("CellsType: ", type(cell))
     if cell == 1:
         instance[0].h1 = period
     elif cell == 2:
@@ -121,4 +127,45 @@ def get_cell_data(cell, instance):
         }
 
 
+def get_subject_attendance(lh, studentName):
+    data = {}
 
+    attendance = {}
+
+    try:
+        lh = list(LectureHall.objects.filter(className=lh))
+        print(studentName)
+        student = Student.objects.get(rollNumber=studentName)
+        if list(lh) != []:
+            subjects = list(Subject.objects.filter(_lh=lh[0]))
+            attendanceObjects = list(
+                LectureHallAttadence.objects.filter(Class=lh[0], name=student)
+            )
+            
+            for i in subjects:
+                attendance[i.subjectName] = {"total": 0, "presence": 0}
+
+            for i in attendanceObjects:
+                periods = i.returnPeriods()
+                for j in range(len(periods)):
+                    if periods[j + 1] != None:
+                        raw_data = str(periods[j + 1]).split(":")
+                        print("periods", j, raw_data)
+                        attendance[raw_data[0]]["total"] += 1
+                        if raw_data[1] == "PRESENT":
+                            attendance[raw_data[0]]["presence"] += 1
+                    
+            print("attendance", attendance)
+
+            for i in attendance:
+                if attendance[i]["presence"] == 0 or attendance[i]["total"] == 0:
+                    data[i] = 0
+                else:
+                    data[i] = (attendance[i]["presence"] / attendance[i]["total"]) * 100
+
+        else:
+            return
+    except Exception as e:
+        print("Error in attendanceManager.serializers:", e)
+
+    return data
