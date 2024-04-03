@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "auth_api",
     "attendanceManager",
     "lecture_hall",
+    "admin_dashboard"
 ]
 
 MIDDLEWARE = [

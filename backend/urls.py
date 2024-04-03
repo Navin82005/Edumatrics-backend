@@ -19,10 +19,15 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
+def adminSite():
+    if settings.DEBUG == True:
+        return path('adminn/', admin.site.urls)
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    adminSite(),
     path('', include('client_web.urls')),
     path('auth/', include('auth_api.urls')),
     path('attendance/', include('attendanceManager.urls')),
     path('timetable/', include('lecture_hall.urls')),
+    path('admin/', include('admin_dashboard.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
