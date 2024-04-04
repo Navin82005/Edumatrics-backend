@@ -14,20 +14,29 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.views.generic import TemplateView
 from django.conf.urls.static import static
 from django.conf import settings
 
+
 def adminSite():
     if settings.DEBUG == True:
-        return path('adminn/', admin.site.urls)
+        return path("adminn/", admin.site.urls)
+
 
 urlpatterns = [
     adminSite(),
-    path('', include('client_web.urls')),
-    path('auth/', include('auth_api.urls')),
-    path('attendance/', include('attendanceManager.urls')),
-    path('timetable/', include('lecture_hall.urls')),
-    path('admin/', include('admin_dashboard.urls')),
+    path("", include("client_web.urls")),
+    # path("auth/", include("auth_api.urls")),
+    path("auth/", include("djoser.urls")),
+    path("auth/", include("djoser.urls.jwt")),
+    path("auth/", include("djoser.social.urls")),
+    path("attendance/", include("attendanceManager.urls")),
+    path("timetable/", include("lecture_hall.urls")),
+    path("admin/", include("admin_dashboard.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += [re_path(r"^.*", TemplateView.as_view(template_name="index.html"))]

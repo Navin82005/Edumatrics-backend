@@ -1,0 +1,26 @@
+section {
+    padding: 3vw 0;
+    display: flex;
+    flex-direction: column;
+}
+
+section h1 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+section .admin-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+section .admin-menu div ul {
+    padding: 0;
+}
+section .admin-menu div ul li {
+    list-style: none;
+    padding-top: 10px;
+}

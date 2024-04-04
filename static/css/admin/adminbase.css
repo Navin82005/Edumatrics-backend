@@ -1,0 +1,6 @@
+nav {
+    padding: 25px 4vw;
+    display: flex;
+    justify-content: end;
+    background-color: #eee;
+}

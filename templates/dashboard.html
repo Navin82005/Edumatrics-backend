@@ -4,17 +4,43 @@
 {% block title %} Dashboard{% endblock title %}
 
 {% block csss %}
-
+<link rel="stylesheet" href="{% static 'css/admin/dashboard.css' %}">
 {% endblock csss %}
 
-{% block nav %}
-
-{% endblock nav %}
 
 {% block body %}
-    <section>
-        
-    </section>
+
+
+<section>
+    <h1>
+        <a href="http://localhost:5173/?username={{ request.user.username }}"> Click here
+            to move to admin panel</a>
+    </h1>
+</section>
+<!-- <section>
+    <h1>Admin Menu</h1>
+    <div class="admin-menu">
+        <div>
+            <h3>Regulars</h3>
+            <ul>
+                <li><a href="#">Update Attendance</a></li>
+                <li><a href="#">Update Time Table</a></li>
+            </ul>
+        </div>
+        <div>
+            <h3>Data</h3>
+            <ul>
+                <li><a href="#">Update Student Data</a></li>
+                <li><a href="#">Update Staff Data</a></li>
+            </ul>
+        </div>
+        <div>
+            <h3>Results</h3>
+            <ul>
+                <li><a href="#">Update Internal Marks</a></li>
+                <li><a href="#">Update Semester Marks</a></li>
+            </ul>
+        </div>
+    </div>
+</section> -->
 {% endblock body %}
-
-

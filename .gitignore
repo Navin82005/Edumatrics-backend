@@ -1,4 +1,9 @@
+
+*\migrations
+*\__pycache__
+
 __pycache__
+migrations
 
 attendanceManager\__pycache__
 attendanceManager\migrations
@@ -11,6 +16,7 @@ backend\migrations
 
 lectureHall\__pycache__
 lectureHall\migrations
+
 
 edumatricsBackend
 .vscode

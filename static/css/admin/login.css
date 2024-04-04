@@ -107,6 +107,11 @@ section {
     cursor: pointer;
 }
 
+.sign-in_btn span {
+    font-size: 17px;
+    font-weight: bold;
+}
+
 .sign-in_ggl {
     width: 100%;
     height: 40px;
@@ -157,7 +162,7 @@ section {
 }
 
 .note {
-    font-size: 0.75rem;
+    font-size: 15px;
     color: #8B8E98;
     text-decoration: underline;
 }

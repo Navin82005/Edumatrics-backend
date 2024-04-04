@@ -22,6 +22,7 @@
     <link href="{% static 'vendor/swiper/css/swiper.min.css' %}" rel="stylesheet" type="text/css" />
     <link href="{% static 'css/layout.min.css' %}" rel="stylesheet" type="text/css" />
     <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'css/admin/adminbase.css' %}" rel="stylesheet" type="text/css" />
 
     {% block csss %}{% endblock csss %}
 
@@ -29,7 +30,11 @@
 
 <body id="body" data-spy="scroll" data-target=".header">
 
-    {% block nav %}{% endblock nav %}
+    {% block nav %}
+    <nav>
+        <div><a href="logout">Exit Admin</a></div>
+    </nav>
+    {% endblock nav %}
     {% block body %}{% endblock body %}
 
     <footer class="footer">
