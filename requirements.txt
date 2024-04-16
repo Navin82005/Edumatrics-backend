@@ -3,3 +3,4 @@ django-cors-headers==4.3.1
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.1
 bcrypt==4.1.2
+openpyxl==3.1.2

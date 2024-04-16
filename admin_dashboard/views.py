@@ -2,12 +2,15 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.http import JsonResponse, HttpResponseNotFound
-
 from django.contrib.auth.models import User
+
 from .models import Admins
+from .serializer import getStudents
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+import json
 
 
 @login_required(login_url="/admin/adminlogin")
@@ -65,6 +68,37 @@ def verify_admin(request, username):
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found"}, status=404)
 
+
 def logout_account(request):
     logout(request)
     return redirect("/")
+
+
+class InternalStudents(APIView):
+    def get(self, request, *args, **kwargs):
+        department = kwargs["department"]
+        print(list(kwargs))
+        print(list(args))
+        sem = request.query_params.get("sem")
+        iit = request.query_params.get("iit")
+        print(sem, iit)
+
+        data = getStudents(department, sem, iit)
+        # data = [
+        #     {
+        #         "regNo": 714022104095,
+        #         "rollNo": "22CS095",
+        #         "name": "naveen n",
+        #     },
+        #     {
+        #         "regNo": 714022104096,
+        #         "rollNo": "22CS096",
+        #         "name": "naveen raj p",
+        #     },
+        # ]
+        # print(data)
+
+        # data_json = json.dumps(data)
+        # data_dict = json.loads(data_json)
+
+        return JsonResponse({"students": data}, status=200)

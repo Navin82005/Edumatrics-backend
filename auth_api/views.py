@@ -6,10 +6,11 @@ from .serializers import (
     StaffLoginSerializer,
     get_tokens_for_user,
     StudentLoginSerializer,
+    get_username_from_access_token,
+    user_data,
 )
 from django.contrib.auth import authenticate
 from .models import *
-
 
 # ACCESS TOKEN REFRESHER API
 class RefreshAccessToken(APIView):
@@ -24,99 +25,38 @@ class RefreshAccessToken(APIView):
             status=status.HTTP_200_OK,
         )
 
+class UserDataAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        access = request.headers.get("Authorization").split()[1]
 
-# LOGIN API
-class StaffLoginAPIView(APIView):
-    def post(self, request, *args, **kwargs):
-        # Serialize and validate the incoming data
-        serializer = StaffLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            username = serializer.validated_data["username"]
-            password = serializer.validated_data["password"]
-
-            # Authenticate the user
-            user = Staff.authenticate(username, password)
-
+        if access is not None:
+            user = get_username_from_access_token(access)
+            
             if user is not None:
-                # User is authenticated
-                tokens = get_tokens_for_user(user)
-
-                return Response(
-                    {
-                        "tokens": tokens,
-                        "userData": user.get_main_data(),
-                    },
-                    status=status.HTTP_200_OK,
-                )
+                try:
+                    profile = user.profile
+                    if profile is not None:
+                        _user_data = user_data(user, profile.type)
+                        return Response(
+                            _user_data,
+                            status=status.HTTP_200_OK,
+                        )
+                    else:
+                        new_profile = Profile.objects.create(username=user, type="student")
+                        new_profile.save()
+                except Exception as e:
+                    print("Error auth_api.views.UserDataAPIView: " + str(e))
             else:
-                # Invalid credentials
                 return Response(
                     {"message": "Invalid credentials"},
                     status=status.HTTP_401_UNAUTHORIZED,
                 )
         else:
-            # Invalid data
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class AdminLoginAPIView(APIView):
-    def post(self, request, *args, **kwargs):
-        # Serialize and validate the incoming data
-        serializer = StaffLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            username = serializer.validated_data["username"]
-            password = serializer.validated_data["password"]
-
-            # Authenticate the user
-            user = authenticate(username=username, password=password)
-
-            if user is not None:
-                # User is authenticated
-                tokens = get_tokens_for_user(user)
-
-                return Response(
-                    tokens,
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                # Invalid credentials
-                return Response(
-                    {"message": "Invalid credentials"},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                )
-        else:
-            # Invalid data
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class StudentLoginAPIView(APIView):
-    def post(self, request, *args, **kwargs):
-        # Serialize and validate the incoming data
-        serializer = StudentLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            username = serializer.validated_data["username"]
-            password = serializer.validated_data["password"]
-
-            # Authenticate the user
-            user = Student.authenticate(username, password)
-
-            if user is not None:
-                # User is authenticated
-                tokens = get_tokens_for_user(user)
-
-                return Response(
-                    {
-                        "tokens": tokens,
-                        "userData": user.get_main_data(),
-                    },
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                # Invalid credentials
-                return Response(
-                    {"message": "Invalid credentials"},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                )
-        else:
-            # Invalid data
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Invalid credentials"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        return Response(
+                {"message": "Invalid credentials"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )

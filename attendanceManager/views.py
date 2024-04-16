@@ -14,6 +14,7 @@ from .serializers import (
     get_subject_attendance,
 )
 
+from utils import db
 
 # Create your views here.
 class GetStudents(APIView):
@@ -298,21 +299,28 @@ class markAttendance(APIView):
 
 class getAttendance(APIView):
     def get(self, request, *args, **kwargs):
-        studentName = kwargs["student"]
-        lh = kwargs["lh"]
-        _class = lh.split()
-        classes = {"I": 1, "II": 2, "III": 3, "IV": 4, "1": 1, "2": 2, "3": 3, "4": 4}
+        # print("kwargs", list(kwargs))
+        roll_number = kwargs["rollnumber"]
+        sem = kwargs["sem"]
+        # _class = lh.split()
+        # classes = {"I": 1, "II": 2, "III": 3, "IV": 4, "1": 1, "2": 2, "3": 3, "4": 4}
 
-        lh = str(classes[_class[0]]) + " " + " - ".join(_class[1:])
+        # lh = f"{str(classes[_class[0]])} " + " - ".join(_class[1:])
 
-        attendanceData = {"OOPS": 90, "ADSA": 90, "DBMS": 90, "DM": 90, "Verbal": 90}
+        # attendanceData = {"OOPS": 90, "ADSA": 90, "DBMS": 90, "DM": 90, "Verbal": 90}
 
-        attendanceData = get_subject_attendance(lh, studentName)
+        # attendanceData = get_subject_attendance(sem, roll_number)
+
+        # print(sem, roll_number)
+        
+        attendanceData = db.get_attendance(sem, roll_number)
+        
+        print(list(attendanceData))
 
         return Response(
             {
                 "status": 200,
-                "name": studentName,
+                "name": roll_number,
                 "data": attendanceData,
             }
         )

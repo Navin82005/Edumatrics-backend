@@ -30,13 +30,15 @@ def adminSite():
 urlpatterns = [
     adminSite(),
     path("", include("client_web.urls")),
-    # path("auth/", include("auth_api.urls")),
+    path("auth/", include("auth_api.urls")),
     path("auth/", include("djoser.urls")),
     path("auth/", include("djoser.urls.jwt")),
     path("auth/", include("djoser.social.urls")),
     path("attendance/", include("attendanceManager.urls")),
     path("timetable/", include("lecture_hall.urls")),
     path("admin/", include("admin_dashboard.urls")),
+    path("dbmanager/", include("dbmanager.urls")),
+    path("results/", include("results.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += [re_path(r"^.*", TemplateView.as_view(template_name="index.html"))]

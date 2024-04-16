@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     "djoser",
     "social_django",
     "rest_framework_simplejwt.token_blacklist",
+    
+    "results",
 ]
 
 MIDDLEWARE = [
@@ -171,7 +173,7 @@ SIMPLE_JWT = {
 }
 
 DJOSER = {
-    "LOGIN_FIELD": "email",
+    "LOGIN_FIELD": "username",
     "USER_CREATE_PASSWORD_RETYPE": True,
     "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
     "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
@@ -205,23 +207,3 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {"fields": "email, first_name, last_
 
 
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-]
-
-CORS_ALLOW_METHODS = [
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "PATCH",
-    "POST",
-    "PUT",
-]
