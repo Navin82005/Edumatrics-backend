@@ -16,6 +16,7 @@ from .serializers import (
 
 from utils import db
 
+
 # Create your views here.
 class GetStudents(APIView):
 
@@ -297,6 +298,17 @@ class markAttendance(APIView):
         return JsonResponse({"status": 200})
 
 
+class InsertAttendance(APIView):
+    def get(self, request, *args, **kwargs):
+        status = db.insert_attendance()
+
+        return JsonResponse(
+            {
+                "status": status,
+            }
+        )
+
+
 class getAttendance(APIView):
     def get(self, request, *args, **kwargs):
         # print("kwargs", list(kwargs))
@@ -312,9 +324,9 @@ class getAttendance(APIView):
         # attendanceData = get_subject_attendance(sem, roll_number)
 
         # print(sem, roll_number)
-        
+
         attendanceData = db.get_attendance(sem, roll_number)
-        
+
         print(list(attendanceData))
 
         return Response(

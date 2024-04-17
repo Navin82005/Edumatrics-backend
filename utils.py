@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import json
+from datetime import datetime
 
 
 class EduDatabase:
@@ -36,9 +37,7 @@ class EduDatabase:
     def fetch_internals(self, department: str, sem: int, iit: int):
         internals_collection = self.db_handler["results"]
 
-        return internals_collection.find(
-            {"department": department, "sem": sem}
-        )  # "sem": {sem: iit}})
+        return internals_collection.find({"department": department, "sem": sem})
 
     def update_internals(self, data):
         internals_collection = self.db_handler["results"]
@@ -53,12 +52,112 @@ class EduDatabase:
         collection = db_handler["results"]
         collection.delete_many({})
 
-
     def get_attendance(self, sem, regNo):
         data = {}
 
-        collection = db_handler["attendance"]
-        return collection.find()
+        """
+        attendance = {
+            
+        }
+        """
+
+        collection = self.db_handler["attendance"]
+        data = collection.find({"registerNumber": regNo, "sem": sem})
+        print(data)
+        return data
+
+    def update_attendance(self, data, sem):
+        attendance_collection = self.db_handler["attendance"]
+
+        data = [
+            {
+                "registerNumber": 714022104076,
+                "sem": sem,
+                "attendance": {"subject": "PQT", "status": "Present"},
+            },
+            {
+                "registerNumber": 71402210495,
+                "sem": sem,
+                "attendance": {"subject": "PQT", "status": "OD"},
+            },
+            {
+                "registerNumber": 714022104114,
+                "sem": sem,
+                "attendance": {"subject": "PQT", "status": "Absent"},
+            },
+        ]
+
+        # for i in data:
+        #     attendance_collection.update_one({"registerNumber": i["registerNumber"], "sem": i["sem"], "attendance":i[]})
+
+    def insert_attendance(self):
+        attendance_collection = self.db_handler["attendance"]
+
+        data = [
+            {
+                "register_number": 714022104076,
+                "sem": {
+                    "1": {
+                        "internals": {
+                            "1": {"PQT": 90, "ADB": 90, "DAA": 80, "AJP": 95, "IP": 96},
+                            "2": {"PQT": 90, "ADB": 90, "DAA": 80, "AJP": 95, "IP": 96},
+                            "3": {"PQT": 90, "ADB": 90, "DAA": 80, "AJP": 95, "IP": 96},
+                        },
+                        "overall": {
+                            "PQT": 90,
+                            "ADB": 90,
+                            "DAA": 80,
+                            "AJP": 95,
+                            "IP": 96,
+                        },
+                    }
+                },
+            },
+            {
+                "register_number": 714022104095,
+                "sem": {
+                    "1": {
+                        "internals": {
+                            "1": {"PQT": 90, "ADB": 90, "DAA": 80, "AJP": 95, "IP": 96},
+                            "2": {"PQT": 90, "ADB": 90, "DAA": 80, "AJP": 95, "IP": 96},
+                            "3": {"PQT": 90, "ADB": 90, "DAA": 80, "AJP": 95, "IP": 96},
+                        },
+                        "overall": {
+                            "PQT": 90,
+                            "ADB": 90,
+                            "DAA": 80,
+                            "AJP": 95,
+                            "IP": 96,
+                        },
+                    }
+                },
+            },
+        ]
+
+        student_collection = self.db_handler["students"]
+
+        rawData = list(student_collection.find())
+        dataN = []
+        print("Students inside utils.insert_attendance", rawData)
+        for document in rawData:
+            passing_out = int(rawData["Academic Year"].split()[0])
+            current_year = passing_out - datetime.now().year
+            document.pop("_id")
+            print("current_year", current_year)
+            semData = {}
+            for year in range(1, passing_out + 1):
+                semData[f"{year}"] = 
+            temp = {
+                "Roll Number": document["Roll Number"],
+                "Register Number": document["Register Number"],
+                "sem": {},
+            }
+            dataN.append(temp)
+
+        # status = attendance_collection.insert_many(data)
+        # print(status)
+        return dataN
+
 
 db = EduDatabase("edumatrics")
 db.create_connection("navin82005", "navin82005")
