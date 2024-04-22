@@ -314,20 +314,8 @@ class getAttendance(APIView):
         # print("kwargs", list(kwargs))
         roll_number = kwargs["rollnumber"]
         sem = kwargs["sem"]
-        # _class = lh.split()
-        # classes = {"I": 1, "II": 2, "III": 3, "IV": 4, "1": 1, "2": 2, "3": 3, "4": 4}
-
-        # lh = f"{str(classes[_class[0]])} " + " - ".join(_class[1:])
-
-        # attendanceData = {"OOPS": 90, "ADSA": 90, "DBMS": 90, "DM": 90, "Verbal": 90}
-
-        # attendanceData = get_subject_attendance(sem, roll_number)
-
-        # print(sem, roll_number)
 
         attendanceData = db.get_attendance(sem, roll_number)
-
-        print(list(attendanceData))
 
         return Response(
             {
@@ -336,3 +324,33 @@ class getAttendance(APIView):
                 "data": attendanceData,
             }
         )
+
+
+def MarkAttendance(request):
+    if request.method == "GET":
+        status = {"marked successfully": True}
+        raw_data = request.body
+        try:
+            raw_data = json.loads(request.body)
+        except json.decoder.JSONDecodeError:
+            return JsonResponse(
+                {
+                    "status": {"error": "Data not found"},
+                },
+                status=404,
+            )
+
+        status = db.mark_attendance(raw_data[1:], raw_data[0]["sem"])
+
+        return JsonResponse(
+            {
+                "status": status,
+            },
+            status=200
+        )
+    return JsonResponse(
+        {
+            "status": {"error": "Method not allowed"},
+        },
+        status=405,
+    )

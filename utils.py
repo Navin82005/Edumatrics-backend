@@ -62,101 +62,163 @@ class EduDatabase:
         """
 
         collection = self.db_handler["attendance"]
-        data = collection.find({"registerNumber": regNo, "sem": sem})
-        print(data)
-        return data
+        data = collection.find_one({"Register Number": int(regNo)})
 
-    def update_attendance(self, data, sem):
+        return data["sem"][str(sem)]
+
+    def mark_attendance(self, data: list, sem: int):
         attendance_collection = self.db_handler["attendance"]
 
-        data = [
-            {
-                "registerNumber": 714022104076,
-                "sem": sem,
-                "attendance": {"subject": "PQT", "status": "Present"},
-            },
-            {
-                "registerNumber": 71402210495,
-                "sem": sem,
-                "attendance": {"subject": "PQT", "status": "OD"},
-            },
-            {
-                "registerNumber": 714022104114,
-                "sem": sem,
-                "attendance": {"subject": "PQT", "status": "Absent"},
-            },
-        ]
+        # data = [
+        #     {
+        #         "Register Number": 714022104076,
+        #         "sem": sem,
+        #         "attendance": {"subject": "PQT", "status": "Present"},
+        #     },
+        #     {
+        #         "Register Number": 71402210495,
+        #         "sem": sem,
+        #         "attendance": {"subject": "PQT", "status": "OD"},
+        #     },
+        #     {
+        #         "Register Number": 714022104114,
+        #         "sem": sem,
+        #         "attendance": {"subject": "PQT", "status": "Absent"},
+        #     },
+        # ]
+        
+        for _student in data:
+            _old_attendance = attendance_collection.find_one(
+                {"Register Number": _student["Register Number"]}
+            )
+            _subject = _old_attendance["sem"][str(sem)]
+            
+            try:
+                _subject[str(_student["attendance"]["subject"]).lower()]["dates"].pop("")
+            except KeyError:
+                pass
+            try:
+                if str(_student["attendance"]["status"]).lower() == "present" and _subject[str(_student["attendance"]["subject"]).lower()]["dates"][str(datetime.now().date())] == "absent":
+                    _subject[str(_student["attendance"]["subject"]).lower()]["attendance"] += 1
+                elif str(_student["attendance"]["status"]).lower() == "od" and _subject[str(_student["attendance"]["subject"]).lower()]["dates"][str(datetime.now().date())] == "absent":
+                    _subject[str(_student["attendance"]["subject"]).lower()]["attendance"] += 1
+                elif str(_student["attendance"]["status"]).lower() == "absent" and _subject[str(_student["attendance"]["subject"]).lower()]["dates"][str(datetime.now().date())] == "od":
+                    _subject[str(_student["attendance"]["subject"]).lower()]["attendance"] -= 1
+                elif str(_student["attendance"]["status"]).lower() == "absent" and _subject[str(_student["attendance"]["subject"]).lower()]["dates"][str(datetime.now().date())] == "present":
+                    _subject[str(_student["attendance"]["subject"]).lower()]["attendance"] -= 1
+                _subject[str(_student["attendance"]["subject"]).lower()]["dates"][str(datetime.now().date())] = str(_student["attendance"]["status"]).lower()
+            except KeyError:
+                _subject[str(_student["attendance"]["subject"]).lower()]["dates"][str(datetime.now().date())] = str(_student["attendance"]["status"]).lower()
+                if str(_student["attendance"]["status"]).lower() == "present":
+                    _subject[str(_student["attendance"]["subject"]).lower()]["attendance"] += 1
+                elif str(_student["attendance"]["status"]).lower() == "od":
+                    _subject[str(_student["attendance"]["subject"]).lower()]["attendance"] += 1
 
-        # for i in data:
-        #     attendance_collection.update_one({"registerNumber": i["registerNumber"], "sem": i["sem"], "attendance":i[]})
+            attendance_collection.update_one({"Register Number" : _old_attendance["Register Number"]}, {"$set" : {f"sem.{sem}" : _subject}})
+        return {"marked attendance" : "success"}
 
     def insert_attendance(self):
-        attendance_collection = self.db_handler["attendance"]
 
-        data = [
-            {
-                "register_number": 714022104076,
-                "sem": {
-                    "1": {
-                        "internals": {
-                            "1": {"PQT": 90, "ADB": 90, "DAA": 80, "AJP": 95, "IP": 96},
-                            "2": {"PQT": 90, "ADB": 90, "DAA": 80, "AJP": 95, "IP": 96},
-                            "3": {"PQT": 90, "ADB": 90, "DAA": 80, "AJP": 95, "IP": 96},
-                        },
-                        "overall": {
-                            "PQT": 90,
-                            "ADB": 90,
-                            "DAA": 80,
-                            "AJP": 95,
-                            "IP": 96,
-                        },
-                    }
-                },
-            },
-            {
-                "register_number": 714022104095,
-                "sem": {
-                    "1": {
-                        "internals": {
-                            "1": {"PQT": 90, "ADB": 90, "DAA": 80, "AJP": 95, "IP": 96},
-                            "2": {"PQT": 90, "ADB": 90, "DAA": 80, "AJP": 95, "IP": 96},
-                            "3": {"PQT": 90, "ADB": 90, "DAA": 80, "AJP": 95, "IP": 96},
-                        },
-                        "overall": {
-                            "PQT": 90,
-                            "ADB": 90,
-                            "DAA": 80,
-                            "AJP": 95,
-                            "IP": 96,
-                        },
-                    }
-                },
-            },
-        ]
+        attendance_collection = self.db_handler["attendance"]
 
         student_collection = self.db_handler["students"]
 
         rawData = list(student_collection.find())
         dataN = []
-        print("Students inside utils.insert_attendance", rawData)
+
+        year_map = {
+            "I": 1,
+            "II": 2,
+            "III": 3,
+            "IV": 4,
+            1: "I",
+            2: "II",
+            3: "III",
+            4: "IV",
+        }
+
         for document in rawData:
-            passing_out = int(rawData["Academic Year"].split()[0])
-            current_year = passing_out - datetime.now().year
+            passing_out = int(document["Academic Year"].split()[0])
+            current_year = abs(passing_out - datetime.now().year)
             document.pop("_id")
-            print("current_year", current_year)
-            semData = {}
-            for year in range(1, passing_out + 1):
-                semData[f"{year}"] = 
+            subjects = db_handler["subjects"].find_one({"year": year_map[current_year]})
+
+            subject_attendance_map = {
+                str(current_year): {
+                    subject: {"attendance": 0, "dates": {"": ""}}
+                    for subject in subjects["subjects"]
+                }
+            }
+
             temp = {
                 "Roll Number": document["Roll Number"],
                 "Register Number": document["Register Number"],
-                "sem": {},
+                "sem": subject_attendance_map,
             }
             dataN.append(temp)
+        status = {}
+        try:
+            for _student in dataN:
+                if (
+                    attendance_collection.find_one(
+                        {"Register Number": _student["Register Number"]}
+                    )
+                    is not None
+                ):
+                    old_student = attendance_collection.find_one(
+                        {"Register Number": _student["Register Number"]}
+                    )
+                    old_student["sem"][str(current_year)] = _student["sem"][
+                        str(current_year)
+                    ]
 
-        # status = attendance_collection.insert_many(data)
-        # print(status)
-        return dataN
+                    attendance_collection.update_one(
+                        {"Register Number": _student["Register Number"]},
+                        {"$set": {"sem": old_student["sem"]}},
+                    )
+                    status = {"info": "updated successfully"}
+                else:
+                    attendance_collection.insert_one(_student)
+                    status = {"info": "inserted successfully"}
+        except Exception as e:
+            status = {"info": "failed to insert", "error": str(e)}
+
+        return status
+
+    def update_timetable(self, timetable_data: list) -> dict:
+        timetable_collection = self.db_handler["timetables"]
+
+        try:
+            for _class in timetable_data:
+                if (
+                    timetable_collection.find_one(
+                        {"year": _class["year"], "section": _class["section"]}
+                    )
+                    is not None
+                ):
+                    timetable_collection.find_one_and_replace(
+                        {"year": _class["year"], "section": _class["section"]}, _class
+                    )
+                else:
+                    timetable_collection.insert_one(_class)
+            return {"inserted": True}
+        except Exception as e:
+            return {"inserted": False, "error": str(e)}
+
+    def update_subjects(self, subject_data: list) -> dict:
+        subject_collection = self.db_handler["subjects"]
+
+        try:
+            for _year in subject_data:
+                if subject_collection.find_one({"year": _year["year"]}) is not None:
+                    subject_collection.find_one_and_replace(
+                        {"year": _year["year"]}, _year
+                    )
+                else:
+                    subject_collection.insert_one(_year)
+            return {"inserted": True}
+        except Exception as e:
+            return {"error": str(e)}
 
 
 db = EduDatabase("edumatrics")
@@ -164,13 +226,3 @@ db.create_connection("navin82005", "navin82005")
 db_handler = db.get_database_handler()
 
 student_collection = db_handler["students"]
-
-# print(
-#     student_collection.insert_one(
-#         {
-#             "name": "Naveen N",
-#             "department": "CSE",
-#             "dob": "08-01-2004",
-#         }
-#     )
-# )

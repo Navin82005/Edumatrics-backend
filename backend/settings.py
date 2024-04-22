@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     
     "results",
+    "academics_manager",
 ]
 
 MIDDLEWARE = [
